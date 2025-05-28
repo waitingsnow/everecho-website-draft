@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN" id="htmlLang">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title id="pageTitle">关于 EverEcho</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Noto Sans SC', sans-serif; background:#f0f4f8; padding:1rem; }
+    .lang-toggle { position: fixed; top:1rem; right:1rem; padding:0.25rem 0.5rem; background:#fff; border-radius:0.375rem; cursor:pointer; border:1px solid #e5e7eb; font-size:0.875rem; }
+    .container { max-width:640px; margin:0 auto; background:#fff; border-radius:0.75rem; padding:2rem; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
+  </style>
+</head>
+<body>
+  <button id="langToggleBtn" class="lang-toggle" aria-label="切换语言">EN</button>
+  <div class="container">
+      <img src="logo.png" alt="EverEcho Logo" class="w-32 mx-auto mb-4" />
+      <h1 id="heading" class="text-2xl font-semibold text-center mb-4">欢迎来到 EverEcho</h1>
+    <h2 id="sectionHeading1" class="text-xl font-medium mb-2">什么是 EverEcho?</h2>
+    <p id="sectionParagraph1" class="mb-4">EverEcho 是一个帮助你记录和分享情感体验的平台。</p>
+
+    <h2 id="sectionHeadingFeatures" class="text-xl font-medium mb-2">核心功能</h2>
+    <ul id="featuresList" class="list-disc pl-5 mb-4 space-y-1">
+      <li>随时撰写回响并保存为草稿</li>
+      <li>设置未来的发送时间</li>
+      <li>浏览收到的回响</li>
+      <li>管理个人资料与应用偏好</li>
+    </ul>
+
+    <h2 id="sectionHeading2" class="text-xl font-medium mb-2">为什么选择 EverEcho?</h2>
+    <p id="sectionParagraph2" class="mb-6">我们致力于提供一个安全、温暖的空间，让每个人都能找到属于自己的声音。</p>
+
+    <a href="landing.html" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white rounded-md py-2">立即体验</a>
+  </div>
+<script>
+const translations = {
+  zh: {
+    pageTitle: "关于 EverEcho",
+    heading: "欢迎来到 EverEcho",
+    sectionHeading1: "什么是 EverEcho?",
+    sectionParagraph1: "EverEcho 是一个帮助你记录和分享情感体验的平台。",
+    sectionHeadingFeatures: "核心功能",
+    featureList: [
+      "随时撰写回响并保存为草稿",
+      "设置未来的发送时间",
+      "浏览收到的回响",
+      "管理个人资料与应用偏好"
+    ],
+    sectionHeading2: "为什么选择 EverEcho?",
+    sectionParagraph2: "我们致力于提供一个安全、温暖的空间，让每个人都能找到属于自己的声音。",
+    langToggleBtnText: "EN",
+    ariaLangToggle: "切换语言",
+    htmlLang: "zh-CN"
+  },
+  en: {
+    pageTitle: "About EverEcho",
+    heading: "Welcome to EverEcho",
+    sectionHeading1: "What is EverEcho?",
+    sectionParagraph1: "EverEcho helps you record and share your emotional experiences.",
+    sectionHeadingFeatures: "Key Features",
+    featureList: [
+      "Write echoes and save them as drafts",
+      "Schedule sending for the future",
+      "Browse your received echoes",
+      "Manage profile and preferences"
+    ],
+    sectionHeading2: "Why choose EverEcho?",
+    sectionParagraph2: "We aim to provide a safe and warm space where everyone can find their voice.",
+    langToggleBtnText: "中",
+    ariaLangToggle: "Switch language",
+    htmlLang: "en"
+  }
+};
+let currentLang = "zh";
+const elements = {
+  pageTitle: document.getElementById("pageTitle"),
+  heading: document.getElementById("heading"),
+  sectionHeading1: document.getElementById("sectionHeading1"),
+  sectionParagraph1: document.getElementById("sectionParagraph1"),
+  sectionHeading2: document.getElementById("sectionHeading2"),
+  sectionParagraph2: document.getElementById("sectionParagraph2"),
+  sectionHeadingFeatures: document.getElementById("sectionHeadingFeatures"),
+  featuresList: document.getElementById("featuresList"),
+  langToggleBtn: document.getElementById("langToggleBtn"),
+  htmlLang: document.documentElement
+};
+function applyTranslations(lang) {
+  const trans = translations[lang];
+  elements.pageTitle.textContent = trans.pageTitle;
+  elements.heading.textContent = trans.heading;
+  elements.sectionHeading1.textContent = trans.sectionHeading1;
+  elements.sectionParagraph1.textContent = trans.sectionParagraph1;
+  elements.sectionHeading2.textContent = trans.sectionHeading2;
+  elements.sectionParagraph2.textContent = trans.sectionParagraph2;
+  if (elements.sectionHeadingFeatures) elements.sectionHeadingFeatures.textContent = trans.sectionHeadingFeatures;
+  if (elements.featuresList && Array.isArray(trans.featureList)) {
+    elements.featuresList.innerHTML = '';
+    trans.featureList.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      elements.featuresList.appendChild(li);
+    });
+  }
+  elements.langToggleBtn.textContent = trans.langToggleBtnText;
+  elements.langToggleBtn.setAttribute('aria-label', trans.ariaLangToggle);
+  elements.htmlLang.lang = trans.htmlLang;
+}
+elements.langToggleBtn.addEventListener('click', () => {
+  currentLang = currentLang === 'zh' ? 'en' : 'zh';
+  applyTranslations(currentLang);
+});
+applyTranslations(currentLang);
+</script>
+</body>
+</html>

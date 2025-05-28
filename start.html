@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>EverEcho - 创建您的回响</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+        <style>
+            :root {
+                /* DoorDash-inspired Primary Action Color */
+                --dd-primary-action: #ff6f61; /* Coral Red from example */
+                --dd-primary-action-hover: #e55a4f; /* Darker coral red for hover */
+
+                /* Text Colors (largely kept, ensure contrast on new backgrounds) */
+                --text-primary: #111827; /* Darker gray for primary text, good on light cards */
+                --text-secondary: #4b5563; /* Medium gray for secondary text */
+                --text-hint: #9ca3af; /* Lighter gray for hints/placeholders */
+
+                /* Card Styles from Example */
+                --card-bg: rgba(255, 255, 255, 0.92); /* Slightly more opaque for readability */
+                --card-border-color: rgba(0, 0, 0, 0.03);
+                --card-shadow: 0px 15px 40px rgba(0, 0, 0, 0.12); /* Adjusted shadow slightly */
+                --card-border-radius: 1.25rem; /* Slightly less than 1.5rem for better fit in mobile */
+
+                /* Input Styles from Example */
+                --input-bg: rgba(0, 0, 0, 0.04);
+                --input-border: #d1d5db;
+                --input-focus-border: var(--dd-primary-action);
+                --input-focus-shadow: 0 0 0 3px rgba(255, 111, 97, 0.25);
+                --input-border-radius: 0.625rem; /* 10px, consistent with original button radius */
+            }
+
+            body {
+                font-family: "Noto Sans SC", sans-serif;
+                min-height: 100vh;
+                overscroll-behavior-y: contain;
+                display: flex;
+                flex-direction: column;
+                /* Vibrant gradient background from example */
+                background: linear-gradient(135deg, #4776e6 0%, #30e8bf 100%);
+                color: var(--text-primary);
+                user-select: none;
+            }
+
+            /* Main content container adjustments */
+            main {
+                padding-top: calc(24px + 48px); /* status-bar-height + nav-bar-height */
+                padding-bottom: calc(56px + 20px); /* tab-bar-main-height + home-indicator-height */
+            }
+
+            /* Card Styling (Applied to .content-card, .template-card) */
+            .content-card {
+                background: var(--card-bg);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid var(--card-border-color);
+                box-shadow: var(--card-shadow);
+                border-radius: var(--card-border-radius);
+                color: var(--text-primary); /* Ensure text color is set for cards */
+            }
+
+            /* Nav and Tab bars styling */
+            .app-bar {
+                /* Common style for nav and footer */
+                background: var(--card-bg);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border-color: var(--card-border-color); /* For border-b or border-t */
+                box-shadow: var(--card-shadow);
+                color: var(--text-primary); /* Default text color for app bars */
+            }
+            .app-bar h1,
+            .app-bar button {
+                /* Ensure text elements inside app bars use the dark text color */
+                color: var(--text-primary);
+            }
+            .app-bar .material-icons-outlined {
+                /* Icons on app bars */
+                color: var(--text-secondary);
+            }
+            .app-bar button:hover .material-icons-outlined,
+            .app-bar button:hover {
+                color: var(--dd-primary-action); /* Or a slightly darker gray */
+            }
+
+            /* Button Styling */
+            .btn {
+                padding: 0.6rem 1rem; /* Adjusted padding */
+                border-radius: var(--input-border-radius); /* Consistent rounded corners */
+                font-size: 0.875rem; /* 14px */
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transition:
+                    background-color 0.3s ease,
+                    transform 0.15s ease,
+                    box-shadow 0.3s ease;
+                line-height: 1.4;
+                text-align: center;
+                border: 1px solid transparent;
+            }
+            .btn .material-icons-outlined {
+                font-size: 1.125rem; /* 18px */
+                margin-right: 0.375rem; /* 6px */
+            }
+            .btn:active {
+                transform: scale(0.97);
+            }
+
+            /* Primary Action Button (was btn-accent) */
+            .btn-primary-action {
+                background-color: var(--dd-primary-action);
+                color: white;
+            }
+            .btn-primary-action:hover {
+                background-color: var(--dd-primary-action-hover);
+                box-shadow: 0 4px 15px rgba(255, 111, 97, 0.3);
+            }
+
+            /* Secondary Button (was btn-primary or btn-secondary) */
+            .btn-secondary-action {
+                background-color: #ffffff; /* White background like example social buttons */
+                color: var(--text-secondary);
+                border: 1px solid #e5e7eb; /* Light border */
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            }
+            .btn-secondary-action:hover {
+                background-color: #f9fafb; /* Slightly off-white hover */
+                border-color: #d1d5db;
+            }
+
+            /* Outline Button */
+            .btn-outline-action {
+                background-color: transparent;
+                border: 1.5px solid var(--dd-primary-action);
+                color: var(--dd-primary-action);
+            }
+            .btn-outline-action:hover {
+                background-color: rgba(255, 111, 97, 0.08); /* Light primary color fill on hover */
+            }
+
+            /* Input Field Styling */
+            .input-field,
+            .textarea-field {
+                background-color: var(--input-bg);
+                border: 1px solid var(--input-border);
+                transition:
+                    border-color 0.3s ease,
+                    box-shadow 0.3s ease,
+                    background-color 0.3s ease;
+                color: var(--text-primary);
+                border-radius: var(--input-border-radius);
+                padding: 0.75rem 1rem; /* py-3 px-4 */
+                font-size: 0.875rem;
+            }
+            .input-field::placeholder,
+            .textarea-field::placeholder {
+                color: var(--text-hint);
+            }
+            .input-field:focus,
+            .textarea-field:focus {
+                border-color: var(--input-focus-border);
+                box-shadow: var(--input-focus-shadow);
+                outline: none;
+                background-color: #ffffff; /* White background on focus like example */
+            }
+            .textarea-field {
+                min-height: 100px;
+            }
+
+            /* Template Card Specific Styling */
+            .template-card {
+                background: var(--card-bg);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid var(--card-border-color);
+                color: var(--text-primary);
+                transition:
+                    transform 0.2s ease,
+                    box-shadow 0.2s ease;
+                border-radius: var(--card-border-radius); /* Consistent card radius */
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Lighter shadow for these smaller cards */
+            }
+            .template-card:hover {
+                /* background: rgba(255, 255, 255, 0.98); Slightly brighter on hover */
+                transform: translateY(-4px) scale(1.02);
+                box-shadow: var(--card-shadow); /* Use stronger shadow on hover */
+            }
+            .template-card .material-icons-outlined {
+                /* Keep original icon colors for variety */
+                /* color: var(--dd-primary-action); */ /* Optionally unify icon color */
+            }
+
+            /* Tab Bar Styling */
+            #main-footer .active-tab .material-icons-outlined,
+            #main-footer .active-tab span {
+                color: var(--dd-primary-action);
+            }
+            #main-footer .tab-item span,
+            #main-footer .tab-item .material-icons-outlined {
+                color: var(--text-secondary); /* Darker text for inactive tabs */
+            }
+            #main-footer .tab-item:hover span,
+            #main-footer .tab-item:hover .material-icons-outlined {
+                color: var(--text-primary);
+            }
+            /* Special styling for the central "add" button in tab bar */
+            #main-footer .active-tab div[style*="var(--color-accent-primary)"] {
+                /* Targeting the add button */
+                background-color: var(--dd-primary-action) !important; /* Ensure it uses the new primary color */
+            }
+            #main-footer .active-tab div[style*="var(--color-accent-primary)"] .material-icons-outlined {
+                color: white !important; /* Icon inside should be white */
+            }
+            /* Home indicator bar at the very bottom */
+            .home-indicator-bar {
+                background-color: var(--card-bg); /* Match footer bar background */
+                border-top: 1px solid var(--card-border-color);
+            }
+            .home-indicator-bar div {
+                background-color: rgba(0, 0, 0, 0.15); /* Darker indicator on light bg */
+            }
+
+            /* Scrollbar */
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 6px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: rgba(0, 0, 0, 0.05);
+                border-radius: 3px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: var(--text-hint);
+                border-radius: 3px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: var(--text-secondary);
+            }
+
+            /* Heights */
+            .status-bar-height {
+                height: 24px;
+            }
+            .nav-bar-height {
+                height: 48px;
+            }
+            .tab-bar-main-height {
+                height: 56px;
+            }
+            .home-indicator-height {
+                height: 20px;
+            }
+
+            .step {
+                display: none;
+            }
+            .step-active {
+                display: block;
+                animation: fadeIn 0.5s ease-out;
+            }
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .info-icon {
+                cursor: help;
+                color: var(--text-hint);
+            }
+            .info-icon:hover {
+                color: var(--text-secondary);
+            }
+
+            /* Radio button custom styling */
+            input[type="radio"] {
+                appearance: none;
+                -webkit-appearance: none;
+                width: 18px;
+                height: 18px;
+                border: 2px solid var(--input-border);
+                border-radius: 50%;
+                outline: none;
+                transition: 0.2s all linear;
+                margin-right: 8px;
+                position: relative;
+                top: 3px; /* Align better with label */
+            }
+            input[type="radio"]:checked {
+                border: 5px solid var(--dd-primary-action);
+            }
+            input[type="radio"]:focus-visible {
+                box-shadow: 0 0 0 2px rgba(255, 111, 97, 0.3); /* Use primary action color for focus */
+            }
+
+            /* Date and time input styling */
+            input[type="date"],
+            input[type="time"] {
+                padding: 0.6rem 0.75rem; /* Consistent padding */
+            }
+            input[type="date"]::-webkit-calendar-picker-indicator,
+            input[type="time"]::-webkit-calendar-picker-indicator {
+                opacity: 0.6;
+                cursor: pointer;
+            }
+            input[type="date"]::-webkit-calendar-picker-indicator:hover,
+            input[type="time"]::-webkit-calendar-picker-indicator:hover {
+                opacity: 1;
+            }
+
+            /* Textarea formatting buttons */
+            .formatting-button {
+                background-color: rgba(0, 0, 0, 0.06);
+                border-radius: 0.375rem; /* rounded-md */
+                color: var(--text-secondary);
+                padding: 0.375rem; /* p-1.5 */
+            }
+            .formatting-button:hover {
+                background-color: rgba(0, 0, 0, 0.1);
+                color: var(--text-primary);
+            }
+            .formatting-button .material-icons-outlined {
+                font-size: 1.125rem; /* text-lg */
+            }
+
+            /* Status bar specific style */
+            .status-bar {
+                color: var(--text-primary); /* Dark text on gradient */
+                /* background-color: transparent; Ensure it's transparent */
+            }
+            .status-bar .material-icons-outlined {
+                color: var(--text-primary); /* Dark icons on gradient */
+            }
+
+            /* Modal Style Adjustments */
+            #custom-modal-overlay {
+                background-color: rgba(0, 0, 0, 0.4); /* Darker overlay */
+                backdrop-filter: blur(5px);
+            }
+            #custom-modal {
+                background-color: #ffffff; /* Solid white modal */
+                border-radius: var(--card-border-radius);
+                box-shadow: var(--card-shadow);
+            }
+            #custom-modal h3 {
+                color: var(--text-primary);
+            }
+            #custom-modal p {
+                color: var(--text-secondary);
+            }
+            #custom-modal button {
+                /* Ensure modal button uses new style */
+                /* This will be handled by adding .btn and .btn-primary-action in JS or HTML */
+            }
+        </style>
+    </head>
+    <body class="flex flex-col h-screen">
+        <div class="status-bar fixed top-0 left-0 right-0 z-50 status-bar-height px-3 flex justify-between items-center text-xs">
+            <div id="currentTimeDisplay">9:41</div>
+            <div class="flex items-center space-x-1">
+                <span class="material-icons-outlined text-sm">signal_cellular_alt</span>
+                <span class="material-icons-outlined text-sm">wifi</span>
+                <span class="material-icons-outlined text-sm">battery_full</span>
+            </div>
+        </div>
+
+        <nav id="main-nav" class="app-bar fixed left-0 right-0 z-40 py-0 px-4 shadow-md nav-bar-height flex items-center border-b" style="top: 24px">
+            <div class="max-w-sm mx-auto flex items-center justify-between relative w-full h-full">
+                <button id="back-button" class="p-2 -ml-2 hover:opacity-75 transition-opacity hidden">
+                    <span class="material-icons-outlined">arrow_back_ios_new</span>
+                </button>
+                <h1 id="page-title" class="text-base font-semibold absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">创建您的回响</h1>
+                <button id="save-draft-button" class="btn btn-secondary-action text-xs px-3 py-1.5 hidden"><span class="material-icons-outlined text-sm mr-1">save</span>保存草稿</button>
+            </div>
+        </nav>
+
+        <main class="flex-grow overflow-y-auto custom-scrollbar">
+            <div class="max-w-sm mx-auto w-full px-3">
+                <div id="step-1" class="step step-active py-4">
+                    <h2 class="text-xl font-semibold text-center mb-2" style="color: var(--text-primary)">您想为什么事情/场合创建回响呢？</h2>
+                    <p class="text-sm text-center mb-6" style="color: var(--text-secondary)">选择一个模板，或从空白开始。</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button class="template-card p-4 text-center aspect-square flex flex-col items-center justify-center" onclick="selectTemplate('birthday')">
+                            <span class="material-icons-outlined text-4xl mb-2" style="color: #ff6347">cake</span> <span class="text-sm font-medium" style="color: var(--text-primary)">生日祝福</span>
+                            <span class="text-xs mt-1" style="color: var(--text-hint)">(惊喜祝福!)</span>
+                        </button>
+                        <button class="template-card p-4 text-center aspect-square flex flex-col items-center justify-center" onclick="selectTemplate('future_self')">
+                            <span class="material-icons-outlined text-4xl mb-2" style="color: #60a5fa">send_to_mobile</span> <span class="text-sm font-medium" style="color: var(--text-primary)">给未来的TA</span>
+                            <span class="text-xs mt-1" style="color: var(--text-hint)">(跨时空对话)</span>
+                        </button>
+                        <button class="template-card p-4 text-center aspect-square flex flex-col items-center justify-center" onclick="selectTemplate('for_kids')">
+                            <span class="material-icons-outlined text-4xl mb-2" style="color: #34d399">child_care</span> <span class="text-sm font-medium" style="color: var(--text-primary)">留给孩子的话</span>
+                            <span class="text-xs mt-1" style="color: var(--text-hint)">(爱的传承)</span>
+                        </button>
+                        <button class="template-card p-4 text-center aspect-square flex flex-col items-center justify-center" onclick="selectTemplate('blank')">
+                            <span class="material-icons-outlined text-4xl mb-2" style="color: #a78bfa">edit_note</span> <span class="text-sm font-medium" style="color: var(--text-primary)">我自己来设计</span>
+                            <span class="text-xs mt-1" style="color: var(--text-hint)">(不用模板)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="step-2" class="step py-4 space-y-6">
+                    <div class="content-card p-4 space-y-4">
+                        <div>
+                            <label for="echo-text" class="block text-sm font-medium mb-1.5" style="color: var(--text-secondary)">写下您的心声</label>
+                            <div class="relative">
+                                <textarea id="echo-text" name="echo-text" rows="5" class="textarea-field block w-full p-3 text-sm focus:ring-0" placeholder="在此输入您的心声..."></textarea>
+                                <div class="absolute bottom-2.5 right-2.5 flex space-x-1.5">
+                                    <button class="formatting-button"><span class="material-icons-outlined">format_bold</span></button>
+                                    <button class="formatting-button"><span class="material-icons-outlined">format_italic</span></button>
+                                    <button class="formatting-button"><span class="material-icons-outlined">format_list_bulleted</span></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--text-secondary)">添加视频祝福 (可选)</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button class="btn btn-secondary-action py-3 text-sm"><span class="material-icons-outlined">photo_camera</span>录制视频</button>
+                                <button class="btn btn-secondary-action py-3 text-sm"><span class="material-icons-outlined">upload_file</span>上传视频</button>
+                            </div>
+                            <div id="video-preview-container" class="mt-3 hidden">
+                                <p class="text-xs mb-1" style="color: var(--text-hint)">视频预览：</p>
+                                <div class="aspect-video rounded-lg flex items-center justify-center bg-gray-100">
+                                    {/* Placeholder bg */}
+                                    <span class="material-icons-outlined text-5xl" style="color: var(--text-hint)">play_circle_outline</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card p-4 space-y-4">
+                        <div>
+                            <label for="recipient" class="block text-sm font-medium mb-1.5" style="color: var(--text-secondary)">发送给谁？</label>
+                            <input type="text" name="recipient" id="recipient" class="input-field block w-full px-3 py-2.5 text-sm focus:ring-0" placeholder="例如：妈妈, 未来的我, 小明" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--text-secondary)">什么时候送？</label>
+                            <div class="space-y-3">
+                                <div class="flex items-center">
+                                    <input id="send-specific-date" name="send-type" type="radio" checked />
+                                    <label for="send-specific-date" class="text-sm ml-1" style="color: var(--text-primary)">特定日期发送</label>
+                                </div>
+                                <div id="specific-date-inputs" class="grid grid-cols-2 gap-3 pl-6">
+                                    <input type="date" name="send-date" id="send-date" class="input-field block w-full text-sm focus:ring-0" />
+                                    <input type="time" name="send-time" id="send-time" class="input-field block w-full text-sm focus:ring-0" />
+                                </div>
+                                <div class="flex items-center mt-2">
+                                    <input id="send-legacy" name="send-type" type="radio" />
+                                    <label for="send-legacy" class="text-sm ml-1" style="color: var(--text-primary)">作为‘永久的思念’留存</label>
+                                    <span class="material-icons-outlined text-base ml-1.5 info-icon" title="遗留消息将在您设定的特殊条件下，安全地传递给指定的人。">info_outline</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary-action w-full py-3 mt-5 text-base" onclick="goToStep(3)">下一步：预览与确认 <span class="material-icons-outlined text-xl ml-1">arrow_forward</span></button>
+                </div>
+
+                <div id="step-3" class="step py-4 space-y-5">
+                    <h3 class="text-xl font-semibold text-center" style="color: var(--text-primary)">预览您的回响</h3>
+                    <div class="content-card p-5 space-y-4 text-sm">
+                        <div>
+                            <span class="font-medium" style="color: var(--text-secondary)">将发送给：</span>
+                            <span id="preview-recipient" style="color: var(--text-primary); font-weight: 500">妈妈</span>
+                        </div>
+                        <div>
+                            <span class="font-medium" style="color: var(--text-secondary)">发送时间：</span>
+                            <span id="preview-send-time" style="color: var(--text-primary); font-weight: 500">2025年12月25日 上午9:00</span>
+                        </div>
+                        <hr class="my-3" style="border-color: rgba(0, 0, 0, 0.08)" />
+                        <div>
+                            <p class="font-medium mb-1.5" style="color: var(--text-secondary)">您的文字内容：</p>
+                            <div id="preview-text-content" class="leading-relaxed p-3 rounded-lg max-h-32 overflow-y-auto custom-scrollbar text-sm" style="background-color: rgba(0, 0, 0, 0.03); color: var(--text-primary)">
+                                亲爱的妈妈，<br />生日快乐！希望您今天过得非常开心... (更多文字预览...)
+                            </div>
+                        </div>
+                        <div id="preview-video-section" class="hidden">
+                            <p class="font-medium mb-1.5" style="color: var(--text-secondary)">您的视频祝福：</p>
+                            <div class="aspect-video rounded-lg flex items-center justify-center" style="background-color: rgba(0, 0, 0, 0.06)">
+                                <span class="material-icons-outlined text-6xl cursor-pointer" style="color: var(--text-secondary)">play_circle</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-3 mt-6">
+                        <button class="btn btn-outline-action w-full py-3 text-sm" onclick="goToStep(2)"><span class="material-icons-outlined text-lg mr-1">arrow_back</span>等等，我再改改</button>
+                        <button class="btn btn-primary-action w-full py-3 text-sm" onclick="confirmSend()">确认，就这样安排！<span class="material-icons-outlined text-lg ml-1">check_circle</span></button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer id="main-footer" class="app-bar fixed bottom-0 left-0 right-0 z-40 shadow-t-lg border-t">
+            <div class="max-w-sm mx-auto px-1.5 tab-bar-main-height flex items-center">
+                <div class="flex justify-around items-center w-full">
+                    <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 transition-colors">
+                        <span class="material-icons-outlined text-2xl">home</span>
+                        <span class="text-xs mt-0.5">首页</span>
+                    </a>
+                    <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 transition-colors">
+                        <span class="material-icons-outlined text-2xl">history_edu</span>
+                        <span class="text-xs mt-0.5">草稿箱</span>
+                    </a>
+                    <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 active-tab">
+                        <div class="p-3 rounded-full shadow-lg -mt-5 transform hover:scale-105 transition-all" style="background-color: var(--dd-primary-action)">
+                            <span class="material-icons-outlined text-2xl text-white">add</span>
+                        </div>
+                        <span class="text-xs mt-1">创建</span>
+                    </a>
+                    <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 transition-colors">
+                        <span class="material-icons-outlined text-2xl">schedule_send</span>
+                        <span class="text-xs mt-0.5">待发送</span>
+                    </a>
+                    <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 transition-colors">
+                        <span class="material-icons-outlined text-2xl">person_outline</span>
+                        <span class="text-xs mt-0.5">我的</span>
+                    </a>
+                </div>
+            </div>
+            <div class="home-indicator-bar home-indicator-height flex justify-center items-end pb-1">
+                <div class="w-32 h-1.5 rounded-full"></div>
+            </div>
+        </footer>
+
+        <div id="custom-modal-overlay" class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
+            <div id="custom-modal" class="p-6 rounded-xl shadow-xl w-full max-w-xs text-center">
+                <h3 id="modal-title" class="text-lg font-semibold mb-2">提示</h3>
+                <p id="modal-message" class="text-sm mb-6">您的回响已安排！</p>
+                <button id="modal-confirm-button" class="btn btn-primary-action w-full py-2.5">知道了</button>
+            </div>
+        </div>
+
+        <script>
+            let currentStep = 1;
+            const steps = [document.getElementById("step-1"), document.getElementById("step-2"), document.getElementById("step-3")];
+            const pageTitle = document.getElementById("page-title");
+            const backButton = document.getElementById("back-button");
+            const saveDraftButton = document.getElementById("save-draft-button");
+
+            // Input fields for preview
+            const recipientInput = document.getElementById("recipient");
+            const sendDateInput = document.getElementById("send-date");
+            const sendTimeInput = document.getElementById("send-time");
+            const echoTextInput = document.getElementById("echo-text");
+            const sendSpecificDateRadio = document.getElementById("send-specific-date");
+            const sendLegacyRadio = document.getElementById("send-legacy");
+
+            // Preview elements
+            const previewRecipient = document.getElementById("preview-recipient");
+            const previewSendTime = document.getElementById("preview-send-time");
+            const previewTextContent = document.getElementById("preview-text-content");
+            const previewVideoSection = document.getElementById("preview-video-section");
+
+            // Modal elements
+            const customModalOverlay = document.getElementById("custom-modal-overlay");
+            const modalTitle = document.getElementById("modal-title");
+            const modalMessage = document.getElementById("modal-message");
+            const modalConfirmButton = document.getElementById("modal-confirm-button");
+
+            // Time display in status bar
+            const currentTimeDisplay = document.getElementById("currentTimeDisplay");
+
+            function updateStatusBarTime() {
+                if (currentTimeDisplay) {
+                    const now = new Date();
+                    currentTimeDisplay.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+                }
+            }
+
+            function showModal(title, message, buttonText = "知道了", onConfirm = () => {}) {
+                modalTitle.textContent = title;
+                modalMessage.textContent = message;
+
+                // Ensure the modal button has the correct new styling
+                modalConfirmButton.textContent = buttonText;
+                modalConfirmButton.className = "btn btn-primary-action w-full py-2.5"; // Apply new styles
+
+                customModalOverlay.classList.remove("hidden");
+                customModalOverlay.classList.add("flex");
+
+                const newButton = modalConfirmButton.cloneNode(true);
+                modalConfirmButton.parentNode.replaceChild(newButton, modalConfirmButton);
+
+                newButton.addEventListener(
+                    "click",
+                    () => {
+                        customModalOverlay.classList.add("hidden");
+                        customModalOverlay.classList.remove("flex");
+                        onConfirm();
+                    },
+                    { once: true },
+                ); // Ensure listener is added only once or use {once: true}
+            }
+
+            function updateNavButtons() {
+                if (currentStep === 1) {
+                    backButton.classList.add("hidden");
+                    saveDraftButton.classList.add("hidden");
+                    pageTitle.textContent = "创建您的回响";
+                } else if (currentStep === 2) {
+                    backButton.classList.remove("hidden");
+                    // Apply new style to save draft button if it wasn't already
+                    saveDraftButton.className = "btn btn-secondary-action text-xs px-3 py-1.5";
+                    saveDraftButton.classList.remove("hidden");
+                    pageTitle.textContent = "编辑您的心声";
+                } else if (currentStep === 3) {
+                    backButton.classList.remove("hidden");
+                    saveDraftButton.classList.add("hidden");
+                    pageTitle.textContent = "预览与确认";
+                }
+            }
+
+            function goToStep(stepNumber) {
+                if (stepNumber < 1 || stepNumber > steps.length) return;
+
+                if (stepNumber === 3) {
+                    populatePreview();
+                }
+
+                steps.forEach((step) => step.classList.remove("step-active"));
+                steps[stepNumber - 1].classList.add("step-active");
+                currentStep = stepNumber;
+                updateNavButtons();
+                // Scroll main content area to top, not the whole window
+                document.querySelector("main").scrollTo(0, 0);
+            }
+
+            function selectTemplate(templateType) {
+                console.log("Selected template:", templateType);
+                if (templateType === "birthday") {
+                    echoTextInput.value = "亲爱的[姓名]，\n\n生日快乐！希望您拥有美好的一天！\n\nBest,\n[您的名字]";
+                } else if (templateType === "future_self") {
+                    echoTextInput.value = "嗨，未来的我，\n\n希望你一切都好...\n\n来自过去的你";
+                } else if (templateType === "for_kids") {
+                    echoTextInput.value = "亲爱的宝贝，\n\n有些话想对你说...\n\n永远爱你的，\n[爸爸/妈妈]";
+                } else {
+                    echoTextInput.value = "";
+                }
+                goToStep(2);
+            }
+
+            function populatePreview() {
+                previewRecipient.textContent = recipientInput.value || "[未填写]";
+
+                if (sendSpecificDateRadio.checked) {
+                    const dateValue = sendDateInput.value;
+                    let dateString = "[未设定日期]";
+                    if (dateValue) {
+                        try {
+                            const dateObj = new Date(dateValue + "T00:00:00");
+                            if (!isNaN(dateObj)) {
+                                dateString = dateObj.toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" });
+                            }
+                        } catch (e) {
+                            console.error("Error parsing date:", e);
+                        }
+                    }
+                    const time = sendTimeInput.value || "[未设定时间]";
+                    previewSendTime.textContent = `${dateString} ${time}`;
+                } else if (sendLegacyRadio.checked) {
+                    previewSendTime.textContent = "已设为‘永久的思念’";
+                }
+
+                previewTextContent.innerHTML = (echoTextInput.value.replace(/\n/g, "<br>") || "[无文字内容]").trim() === "<br>" || echoTextInput.value.trim() === "" ? "[无文字内容]" : echoTextInput.value.replace(/\n/g, "<br>");
+
+                // Mock video preview logic (can be expanded)
+                // if (false) { // Replace with actual check for video
+                //   previewVideoSection.classList.remove('hidden');
+                // } else {
+                //   previewVideoSection.classList.add('hidden');
+                // }
+            }
+
+            function confirmSend() {
+                console.log("确认发送按钮被点击。");
+                showModal("发送成功", "您的回响已成功安排！", "太棒了", () => {
+                    goToStep(1);
+                    recipientInput.value = "";
+                    echoTextInput.value = "";
+                    // Reset date and time to default after sending
+                    setDefaultDateTime();
+                    sendSpecificDateRadio.checked = true;
+                    specificDateInputsContainer.classList.remove("hidden");
+                });
+            }
+
+            backButton.addEventListener("click", () => {
+                if (currentStep > 1) {
+                    goToStep(currentStep - 1);
+                }
+            });
+
+            saveDraftButton.addEventListener("click", () => {
+                console.log("草稿已保存！");
+                showModal("保存成功", "您的草稿已成功保存！");
+            });
+
+            const specificDateInputsContainer = document.getElementById("specific-date-inputs");
+            sendSpecificDateRadio.addEventListener("change", () => {
+                if (sendSpecificDateRadio.checked) {
+                    specificDateInputsContainer.classList.remove("hidden");
+                }
+            });
+            sendLegacyRadio.addEventListener("change", () => {
+                if (sendLegacyRadio.checked) {
+                    specificDateInputsContainer.classList.add("hidden");
+                }
+            });
+
+            function setDefaultDateTime() {
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, "0");
+                const dd = String(today.getDate()).padStart(2, "0");
+                if (!sendDateInput.value || currentStep === 1) {
+                    // Reset if on step 1 or empty
+                    sendDateInput.value = `${yyyy}-${mm}-${dd}`;
+                }
+                if (!sendTimeInput.value || currentStep === 1) {
+                    const hh = String(today.getHours()).padStart(2, "0");
+                    const MM = String(today.getMinutes()).padStart(2, "0");
+                    sendTimeInput.value = `${hh}:${MM}`;
+                }
+            }
+
+            // Initial setup
+            updateStatusBarTime();
+            setInterval(updateStatusBarTime, 60000); // Update time every minute
+
+            updateNavButtons();
+            setDefaultDateTime(); // Set initial date/time
+
+            if (sendSpecificDateRadio.checked) {
+                specificDateInputsContainer.classList.remove("hidden");
+            } else {
+                specificDateInputsContainer.classList.add("hidden");
+            }
+        </script>
+    </body>
+</html>

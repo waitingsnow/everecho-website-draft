@@ -1,0 +1,83 @@
+# Frontend development .gitignore
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+yarn.lock
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+/coverage
+/.nyc_output
+/cypress/videos
+/cypress/screenshots
+
+# Production
+/build
+/dist
+/.next/
+/out/
+/.nuxt/
+/.output/
+storybook-static
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# IDE
+.zed/
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.code-workspace
+*.sublime-*
+.history
+.ionide
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+logs
+*.log
+
+# Misc
+.cache/
+.temp/
+.eslintcache
+.stylelintcache
+.browserslistrc
+.vercel
+.netlify
+sitemap.xml
+sitemap-*.xml
+robots.txt
+/.sass-cache
+/connect.lock
+/libpeerconnection.log
+testem.log
+
+# Temporary files
+*.swp
+*.swo
+*~
+
+# Generated files
+.docusaurus
+
+# TypeScript
+*.tsbuildinfo

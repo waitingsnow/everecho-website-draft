@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN" id="htmlLang">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title id="pageTitle">现代极简风登录页 - EverEcho</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background: linear-gradient(135deg, #4776E6 0%, #30E8BF 100%); /* Vibrant gradient */
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      margin: 0;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+    .login-card-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(0, 0, 0, 0.03);
+      box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.1);
+      position: relative;
+      border-radius: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .input-field {
+      background-color: rgba(0, 0, 0, 0.04);
+      border: 1px solid #D1D5DB;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      color: #111827;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .input-field::placeholder {
+      color: #9CA3AF;
+    }
+    .input-field:focus {
+      border-color: #FF6F61;
+      box-shadow: 0 0 0 3px rgba(255, 111, 97, 0.25);
+      outline: none;
+      background-color: #FFFFFF;
+    }
+    .login-button { /* General class for login buttons */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: background-color 0.3s ease, transform 0.1s ease;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .login-button:active {
+        transform: scale(0.97);
+    }
+    .primary-login-button { /* For the main login button */
+        background-color: #FF6F61;
+        color: #FFFFFF;
+    }
+    .primary-login-button:hover {
+        background-color: #E55A4F;
+    }
+    .social-login-button {
+        background-color: #FFFFFF;
+        color: #374151;
+        border: 1px solid #E5E7EB;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    .social-login-button:hover {
+        background-color: #F9FAFB;
+    }
+    .social-login-button svg, .social-login-button .material-icons-outlined {
+        margin-right: 0.75rem;
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease forwards;
+    }
+    .lang-btn {
+      position: absolute;
+      top: 3rem;
+      right: 1rem;
+      background-color: rgba(0, 0, 0, 0.04);
+      color: #4B5563;
+      padding: 0.3rem 0.6rem;
+      border-radius: 0.5rem;
+      font-size: 0.75rem;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      z-index: 20;
+    }
+    .lang-btn:hover {
+      background-color: rgba(0, 0, 0, 0.08);
+      color: #111827;
+    }
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #4B5563;
+      padding: 0.5rem 1rem;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2.5rem;
+      z-index: 10;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .status-bar-icons span.material-icons-outlined {
+      font-size: 1rem;
+      margin-left: 0.25rem;
+      color: #4B5563;
+    }
+    /* Updated .logo-section styles */
+    .logo-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* flex: 2; and padding: 2rem 1rem; and flex-direction: column are removed as per new styles */
+      /* Added padding here to maintain some spacing, adjust as needed */
+      padding: 1rem;
+    }
+    /* Added .logo-section img styles */
+    .logo-section img {
+      max-width: 100%;
+      max-height: 100%; /* This will make the image take full height of its container if possible */
+      object-fit: contain;
+    }
+    .login-options-section {
+        flex: 1; /* Decreased flex proportion for login options */
+        padding: 1.5rem 2rem 1.5rem 2rem;
+        background-color: rgba(255,255,255,0.85);
+        border-top: 1px solid rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+    .footer-links {
+        margin-top: auto;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .password-wrapper .input-field {
+        padding-right: 2.5rem;
+    }
+    .password-toggle-btn {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #9CA3AF;
+      cursor: pointer;
+      padding: 0.25rem;
+    }
+    .password-toggle-btn .material-icons-outlined {
+      font-size: 1.25rem;
+    }
+
+  </style>
+</head>
+<body>
+  <main
+    role="main"
+    aria-label="登录表单"
+    class="login-card-container rounded-3xl max-w-sm w-full shadow-2xl fade-in-up"
+    style="min-height: 85vh; max-height: 95vh; padding-top: 2.5rem;">
+
+    <div class="status-bar">
+      <span id="timeDisplay"></span>
+      <div class="status-bar-icons">
+        <span class="material-icons-outlined">signal_cellular_alt</span>
+        <span class="material-icons-outlined">wifi</span>
+        <span class="material-icons-outlined">battery_full</span>
+      </div>
+    </div>
+
+    <button id="langToggleBtn" class="lang-btn" aria-label="切换语言">EN</button>
+
+    <div class="logo-section">
+      <img
+        src="logo with background.png"
+        alt="EverEcho Logo"
+        class="w-auto h-auto mb-4" /* Adjusted classes: max-w-full, max-h-48, object-contain are now handled by CSS */
+        onerror="this.onerror=null; this.src='https://placehold.co/240x120/cccccc/333333?text=Logo+Error&font=noto-sans-sc';"
+      />
+      <p id="slogan" class="text-lg text-white text-center font-medium mt-2">专属你的情感时光机</p> </div>
+
+    <div class="login-options-section">
+      <div class="space-y-4 flex-grow">
+        <div>
+          <label for="email" id="labelEmail" class="block text-sm font-medium text-gray-600 mb-1">邮箱 / 注册</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="请输入您的邮箱"
+            autocomplete="email"
+            required
+            class="input-field block w-full px-4 py-3 rounded-lg focus:ring-0 text-sm" />
+        </div>
+
+        <div>
+            <label for="password" id="labelPassword" class="block text-sm font-medium text-gray-600 mb-1">密码</label>
+            <div class="password-wrapper">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="请输入您的密码"
+                autocomplete="current-password"
+                required
+                class="input-field block w-full px-4 py-3 rounded-lg focus:ring-0 text-sm" />
+              <button type="button" id="passwordToggleBtn" class="password-toggle-btn" aria-label="显示密码">
+                <span class="material-icons-outlined" id="passwordToggleIcon">visibility</span>
+              </button>
+            </div>
+        </div>
+
+        <button id="btnLogin" type="submit" class="login-button primary-login-button w-full">
+            登录
+        </button>
+
+        <a href="#" id="linkForgotPassword" class="block text-center text-sm text-gray-500 hover:text-gray-700 pt-1">忘记用户名或密码?</a>
+
+        <button id="btnWeChatLogin" type="button" class="login-button social-login-button w-full">
+            <span class="material-icons-outlined text-[#07C160]">chat</span>
+            <span id="labelWeChatLogin">链接微信</span>
+        </button>
+
+        <button id="btnGoogleLogin" type="button" class="login-button social-login-button w-full">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21.9999 12.229C21.9999 11.529 21.9399 10.839 21.8199 10.169H12.1799V14.039H17.8699C17.6399 15.279 16.9199 16.339 15.8199 17.039V19.549H19.0599C20.8899 17.879 21.9999 15.299 21.9999 12.229Z" fill="#4285F4"/>
+              <path d="M12.1799 22.0004C15.0199 22.0004 17.3799 21.0604 19.0699 19.5504L15.8299 17.0404C14.9099 17.6704 13.6699 18.0804 12.1799 18.0804C9.3799 18.0804 7.0199 16.2004 6.1499 13.6904H2.7699V16.2704C4.4599 19.7104 8.0199 22.0004 12.1799 22.0004Z" fill="#34A853"/>
+              <path d="M6.1499 13.6901C5.8799 12.9601 5.7299 12.1801 5.7299 11.3901C5.7299 10.6001 5.8799 9.8201 6.1399 9.0901V6.5101H2.7699C1.7199 8.5701 1.2499 10.8301 1.2499 11.3901C1.2499 11.9501 1.7099 14.2101 2.7699 16.2701L6.1499 13.6901Z" fill="#FBBC05"/>
+              <path d="M12.1799 5.92042C13.7499 5.92042 15.1099 6.47042 16.2199 7.48042L19.1299 4.70042C17.3699 3.03042 15.0099 2.00042 12.1799 2.00042C8.0199 2.00042 4.4599 4.29042 2.7699 7.73042L6.1399 10.3104C7.0099 7.80042 9.3699 5.92042 12.1799 5.92042Z" fill="#EA4335"/>
+            </svg>
+            <span id="labelGoogleLogin">链接Google</span>
+        </button>
+      </div>
+
+      <div class="footer-links text-center space-x-2 mt-4">
+          <a href="#" id="linkHelp" class="text-xs text-gray-500 hover:text-gray-700">帮助/联系我们</a>
+          <span class="text-xs text-gray-500">|</span>
+          <a href="#" id="linkLegal" class="text-xs text-gray-500 hover:text-gray-700">法律/隐私</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const translations = {
+      zh: {
+        pageTitle: "现代极简风登录页 - EverEcho",
+        slogan: "专属你的情感时光机",
+        labelEmail: "邮箱 / 注册",
+        placeholderEmail: "请输入您的邮箱",
+        labelPassword: "密码",
+        placeholderPassword: "请输入您的密码",
+        btnLogin: "登录",
+        langToggleBtnText: "EN",
+        ariaLangToggle: "切换语言",
+        htmlLang: "zh-CN",
+        labelWeChatLogin: "链接微信",
+        labelGoogleLogin: "链接Google",
+        ariaWeChatLogin: "使用微信登录",
+        ariaGoogleLogin: "使用谷歌登录",
+        linkForgotPassword: "忘记用户名或密码?",
+        linkHelp: "帮助/联系我们",
+        linkLegal: "法律/隐私",
+        ariaPasswordToggleShow: "显示密码",
+        ariaPasswordToggleHide: "隐藏密码"
+      },
+      en: {
+        pageTitle: "Modern Minimalist Login Page - EverEcho",
+        slogan: "Your exclusive emotional time machine",
+        labelEmail: "Email / Register",
+        placeholderEmail: "Enter your email address",
+        labelPassword: "Password",
+        placeholderPassword: "Enter your password",
+        btnLogin: "Login",
+        langToggleBtnText: "中",
+        ariaLangToggle: "Switch language",
+        htmlLang: "en",
+        labelWeChatLogin: "Link WeChat",
+        labelGoogleLogin: "Link Google",
+        ariaWeChatLogin: "Login with WeChat",
+        ariaGoogleLogin: "Login with Google",
+        linkForgotPassword: "Forgot username or password?",
+        linkHelp: "Help/Contact Us",
+        linkLegal: "Legal/Privacy",
+        ariaPasswordToggleShow: "Show password",
+        ariaPasswordToggleHide: "Hide password"
+      }
+    };
+
+    let currentLang = 'zh';
+
+    const elementsToTranslate = {
+      pageTitle: document.getElementById('pageTitle'),
+      slogan: document.getElementById('slogan'),
+      labelEmail: document.getElementById('labelEmail'),
+      inputEmail: document.getElementById('email'),
+      labelPassword: document.getElementById('labelPassword'),
+      inputPassword: document.getElementById('password'),
+      btnLogin: document.getElementById('btnLogin'),
+      langToggleBtn: document.getElementById('langToggleBtn'),
+      htmlLang: document.documentElement,
+      labelWeChatLogin: document.getElementById('labelWeChatLogin'),
+      labelGoogleLogin: document.getElementById('labelGoogleLogin'),
+      btnWeChatLogin: document.getElementById('btnWeChatLogin'),
+      btnGoogleLogin: document.getElementById('btnGoogleLogin'),
+      linkForgotPassword: document.getElementById('linkForgotPassword'),
+      linkHelp: document.getElementById('linkHelp'),
+      linkLegal: document.getElementById('linkLegal'),
+      passwordToggleBtn: document.getElementById('passwordToggleBtn')
+    };
+
+    const timeDisplay = document.getElementById('timeDisplay');
+    const passwordInput = document.getElementById('password');
+    const passwordToggleBtn = document.getElementById('passwordToggleBtn');
+    const passwordToggleIcon = document.getElementById('passwordToggleIcon');
+
+    function updateTime() {
+      if (timeDisplay) {
+        const now = new Date();
+        timeDisplay.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+      }
+    }
+
+    function applyTranslations(lang) {
+      const trans = translations[lang];
+      elementsToTranslate.pageTitle.textContent = trans.pageTitle;
+      elementsToTranslate.slogan.textContent = trans.slogan;
+      elementsToTranslate.labelEmail.textContent = trans.labelEmail;
+      elementsToTranslate.inputEmail.placeholder = trans.placeholderEmail;
+      if(elementsToTranslate.labelPassword) elementsToTranslate.labelPassword.textContent = trans.labelPassword;
+      if(elementsToTranslate.inputPassword) elementsToTranslate.inputPassword.placeholder = trans.placeholderPassword;
+      if(elementsToTranslate.btnLogin) elementsToTranslate.btnLogin.textContent = trans.btnLogin;
+      elementsToTranslate.langToggleBtn.textContent = trans.langToggleBtnText;
+      elementsToTranslate.langToggleBtn.setAttribute('aria-label', trans.ariaLangToggle);
+      elementsToTranslate.htmlLang.lang = trans.htmlLang;
+
+      if(elementsToTranslate.labelWeChatLogin) elementsToTranslate.labelWeChatLogin.textContent = trans.labelWeChatLogin;
+      if(elementsToTranslate.labelGoogleLogin) elementsToTranslate.labelGoogleLogin.textContent = trans.labelGoogleLogin;
+      if(elementsToTranslate.btnWeChatLogin) elementsToTranslate.btnWeChatLogin.setAttribute('aria-label', trans.ariaWeChatLogin);
+      if(elementsToTranslate.btnGoogleLogin) elementsToTranslate.btnGoogleLogin.setAttribute('aria-label', trans.ariaGoogleLogin);
+      if(elementsToTranslate.linkForgotPassword) elementsToTranslate.linkForgotPassword.textContent = trans.linkForgotPassword;
+      if(elementsToTranslate.linkHelp) elementsToTranslate.linkHelp.textContent = trans.linkHelp;
+      if(elementsToTranslate.linkLegal) elementsToTranslate.linkLegal.textContent = trans.linkLegal;
+
+      const sloganEl = document.getElementById('slogan');
+      if (sloganEl) {
+        sloganEl.classList.remove('text-dark-card');
+        sloganEl.classList.add('text-white');
+        sloganEl.style.color = '#FFFFFF'; // Force white for slogan
+      }
+
+      const labelElements = document.querySelectorAll('.login-options-section label, .login-options-section a, .footer-links a, .footer-links span');
+      labelElements.forEach(el => {
+        el.classList.remove('text-dark-card', 'text-dark-card-secondary');
+        if (el.tagName === 'A' && (el.id === 'linkForgotPassword' || el.id === 'linkHelp' || el.id === 'linkLegal')) {
+            el.classList.add('text-gray-500'); // Or a suitable color for links on light bg
+             if (el.matches(':hover')) { el.classList.add('text-gray-700');} // Example hover
+        } else if (el.tagName === 'A') {
+           // Keep accent color for other main links if any, or set default
+        }
+         else {
+           el.classList.add('text-gray-600');
+        }
+      });
+
+
+      if (elementsToTranslate.passwordToggleBtn && passwordInput) {
+        const isPasswordVisible = passwordInput.type === 'text';
+        elementsToTranslate.passwordToggleBtn.setAttribute('aria-label', isPasswordVisible ? trans.ariaPasswordToggleHide : trans.ariaPasswordToggleShow);
+      }
+
+      const mainFormContainer = document.querySelector('main[role="main"]');
+      if (mainFormContainer) {
+        mainFormContainer.setAttribute('aria-label', lang === 'zh' ? '登录表单' : 'Login Form');
+      }
+    }
+
+    if (elementsToTranslate.langToggleBtn) {
+        elementsToTranslate.langToggleBtn.addEventListener('click', () => {
+        currentLang = currentLang === 'zh' ? 'en' : 'zh';
+        applyTranslations(currentLang);
+        });
+    }
+
+    if (passwordToggleBtn && passwordInput && passwordToggleIcon) {
+      passwordToggleBtn.addEventListener('click', () => {
+        const type = passwordInput.type === "password" ? "text" : "password";
+        passwordInput.type = type;
+        passwordToggleIcon.textContent = type === "password" ? "visibility" : "visibility_off";
+        passwordToggleBtn.setAttribute('aria-label', type === "password" ? translations[currentLang].ariaPasswordToggleShow : translations[currentLang].ariaPasswordToggleHide);
+      });
+    }
+
+    updateTime();
+    setInterval(updateTime, 1000);
+    applyTranslations(currentLang);
+
+  </script>
+</body>
+</html>

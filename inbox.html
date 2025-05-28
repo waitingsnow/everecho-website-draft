@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>EverEcho - 收到的回响</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <style>
+      :root {
+        /* Primary Action Color from reference (Coral Red) */
+        --dd-primary-action: #ff6f61;
+        --dd-primary-action-hover: #e55a4f;
+
+        /* This page's specific primary button color (Pink) */
+        --pg-primary-pink: #ff70a6;
+        --pg-primary-pink-hover: #ff5c99;
+
+        /* Accent color for stranger cards (Purple) */
+        --pg-accent-purple: #a78bfa;
+        --pg-accent-purple-hover: #8b5cf6;
+
+        /* Text Colors from reference */
+        --text-primary: #111827; /* Darker gray for primary text, good on light cards */
+        --text-secondary: #4b5563; /* Medium gray for secondary text */
+        --text-hint: #9ca3af; /* Lighter gray for hints/placeholders */
+
+        /* Card Styles from reference */
+        --card-bg: rgba(255, 255, 255, 0.92);
+        --card-border-color: rgba(0, 0, 0, 0.03);
+        --card-shadow: 0px 15px 40px rgba(0, 0, 0, 0.12);
+        --card-border-radius: 1.25rem;
+
+        /* Input Styles from reference */
+        --input-border-radius: 0.625rem; /* 10px */
+      }
+
+      body {
+        font-family: "Noto Sans SC", sans-serif;
+        min-height: 100vh;
+        overscroll-behavior-y: contain;
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(135deg, #ff8a8a 0%, #e26ee5 50%, #7879f1 100%); /* Keep this page's gradient */
+        color: var(--text-primary); /* Default text color for content within cards */
+        user-select: none;
+      }
+
+      main {
+        padding-top: calc(24px + 48px);
+        padding-bottom: calc(56px + 20px);
+      }
+
+      /* Glassmorphism Card (Base for received items) */
+      .glassmorphism-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--card-border-color);
+        box-shadow: var(--card-shadow);
+        border-radius: var(--card-border-radius);
+        color: var(--text-primary);
+      }
+
+      /* Special styling for stranger messages card */
+      .stranger-card {
+        /* Inherits .glassmorphism-card styles */
+        /* Optionally, slightly different border or subtle bg tint if needed */
+        border-left: 4px solid var(--pg-accent-purple); /* Accent border */
+      }
+
+      /* Nav and Tab bars styling (from reference .app-bar) */
+      .app-bar {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-color: var(--card-border-color);
+        box-shadow: var(--card-shadow);
+      }
+      .app-bar h1 {
+        color: var(--text-primary);
+      }
+      .app-bar .material-icons-outlined {
+        color: var(--text-secondary);
+      }
+
+      /* Button Styling (base from reference) */
+      .btn {
+        padding: 0.5rem 0.9rem; /* Slightly more padding for better touch target */
+        border-radius: var(--input-border-radius);
+        font-size: 0.75rem; /* 12px */
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background-color 0.3s ease,
+          transform 0.15s ease,
+          box-shadow 0.3s ease;
+        line-height: 1.4;
+        text-align: center;
+        border: 1px solid transparent;
+      }
+      .btn .material-icons-outlined {
+        font-size: 1rem; /* 16px */
+        margin-right: 0.375rem; /* 6px */
+      }
+      .btn:active {
+        transform: scale(0.97);
+      }
+
+      /* Primary button for this page (Pink - e.g., for empty state) */
+      .btn-primary-pink {
+        background-color: var(--pg-primary-pink);
+        color: white;
+      }
+      .btn-primary-pink:hover {
+        background-color: var(--pg-primary-pink-hover);
+        box-shadow: 0 4px 15px rgba(255, 112, 166, 0.3);
+      }
+
+      /* Accent button for stranger messages (Purple) */
+      .btn-accent-purple {
+        background-color: var(--pg-accent-purple);
+        color: white;
+      }
+      .btn-accent-purple:hover {
+        background-color: var(--pg-accent-purple-hover);
+        box-shadow: 0 4px 15px rgba(167, 139, 250, 0.3);
+      }
+
+      /* Tab Bar Styling */
+      #main-footer .tab-item span,
+      #main-footer .tab-item .material-icons-outlined {
+        color: var(--text-secondary);
+      }
+      #main-footer .active-tab .material-icons-outlined,
+      #main-footer .active-tab span {
+        color: var(--dd-primary-action);
+      }
+      #main-footer .tab-item:hover span,
+      #main-footer .tab-item:hover .material-icons-outlined {
+        color: var(--text-primary);
+      }
+      #main-footer .add-button-wrapper div {
+        background-color: var(--dd-primary-action) !important;
+      }
+      #main-footer .add-button-wrapper div .material-icons-outlined {
+        color: white !important;
+      }
+
+      /* Home indicator bar */
+      .home-indicator-bar {
+        background-color: var(--card-bg);
+        border-top: 1px solid var(--card-border-color);
+      }
+      .home-indicator-bar div {
+        background-color: rgba(0, 0, 0, 0.15);
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 3px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: var(--text-hint);
+        border-radius: 3px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
+      }
+
+      .status-bar-height {
+        height: 24px;
+      }
+      .nav-bar-height {
+        height: 48px;
+      }
+      .tab-bar-main-height {
+        height: 56px;
+      }
+      .home-indicator-height {
+        height: 20px;
+      }
+
+      /* Text color adjustments for content inside .glassmorphism-card */
+      .glassmorphism-card .card-text-main {
+        color: var(--text-primary);
+      }
+      .glassmorphism-card .card-text-secondary {
+        color: var(--text-secondary);
+      }
+      .glassmorphism-card .card-text-accent {
+        color: var(--dd-primary-action);
+      }
+      .glassmorphism-card .stranger-card-text-accent {
+        color: var(--pg-accent-purple);
+      } /* Purple for stranger card icon */
+
+      /* Unread dot */
+      .unread-dot {
+        width: 10px; /* Slightly larger */
+        height: 10px;
+        background-color: var(--dd-primary-action); /* Use coral red for unread dot */
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px; /* More spacing */
+        flex-shrink: 0; /* Prevent shrinking */
+      }
+
+      /* Empty state styling */
+      .empty-state-icon {
+        color: var(--text-hint);
+      }
+      .empty-state-text {
+        color: var(--text-secondary);
+      }
+    </style>
+  </head>
+  <body class="text-white flex flex-col h-screen">
+    <div class="fixed top-0 left-0 right-0 z-50 status-bar-height px-3 flex justify-between items-center text-xs bg-transparent">
+      <div id="currentTimeDisplayReceived">9:41</div>
+      <div class="flex items-center space-x-1">
+        <span class="material-icons-outlined text-sm" style="color: #fff">signal_cellular_alt</span>
+        <span class="material-icons-outlined text-sm" style="color: #fff">wifi</span>
+        <span class="material-icons-outlined text-sm" style="color: #fff">battery_full</span>
+      </div>
+    </div>
+
+    <nav class="app-bar fixed left-0 right-0 z-40 py-0 px-4 shadow-md nav-bar-height flex items-center border-b" style="top: 24px">
+      <div class="max-w-sm mx-auto flex items-center justify-center relative w-full h-full">
+        <h1 class="text-base font-semibold">EverEcho: 收到的回响</h1>
+      </div>
+    </nav>
+
+    <main class="flex-grow overflow-y-auto custom-scrollbar">
+      <div class="max-w-sm mx-auto w-full px-3 py-4">
+        <div id="received-empty-state" class="text-center py-12 mt-5 hidden glassmorphism-card p-6">
+          <span class="material-icons-outlined text-7xl empty-state-icon mb-4">mark_email_unread</span>
+          <p class="empty-state-text text-sm mb-3">这里还没有您收到的回响呢。</p>
+          <p class="text-xs empty-state-text mb-6">当朋友或家人给您发送心意时，它们会出现在这里。</p>
+          <button id="empty-state-create-button-received" class="btn btn-primary-pink px-8 py-2.5 text-sm">去创作一个回响</button>
+          <p class="text-xs text-gray-400 mt-4 empty-state-text">(可选提示：告诉朋友您在使用EverEcho，<br />让他们给您发送惊喜吧！)</p>
+        </div>
+
+        <div id="received-list-content" class="space-y-4">
+          <div>
+            <h2 class="text-sm text-white font-medium my-3 px-1">新的朋友请求</h2>
+            <div class="glassmorphism-card stranger-card p-4 shadow-lg mb-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center overflow-hidden">
+                  <span class="material-icons-outlined stranger-card-text-accent text-2xl mr-3">contact_support</span>
+                  <div class="overflow-hidden">
+                    <p class="text-sm font-semibold card-text-main truncate">神秘访客</p>
+                    <p class="text-xs card-text-secondary truncate">“向您发送了一条新的回响，等待您的查看。”</p>
+                  </div>
+                </div>
+                <button class="btn btn-accent-purple text-xs px-3 py-1.5 ml-2 flex-shrink-0"><span class="material-icons-outlined text-sm mr-1">visibility</span>查看并决定</button>
+              </div>
+            </div>
+            <div class="glassmorphism-card stranger-card p-4 shadow-lg">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center overflow-hidden">
+                  <span class="material-icons-outlined stranger-card-text-accent text-2xl mr-3">contact_support</span>
+                  <div class="overflow-hidden">
+                    <p class="text-sm font-semibold card-text-main truncate">路人甲</p>
+                    <p class="text-xs card-text-secondary truncate">“向您发送了一条新的回响，等待您的查看。”</p>
+                  </div>
+                </div>
+                <button class="btn btn-accent-purple text-xs px-3 py-1.5 ml-2 flex-shrink-0"><span class="material-icons-outlined text-sm mr-1">visibility</span>查看并决定</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-5">
+            <h2 class="text-sm text-white font-medium my-3 px-1">已接受的回响</h2>
+            <div class="space-y-3">
+              <div class="glassmorphism-card p-4 shadow-lg cursor-pointer hover:shadow-xl transition-shadow">
+                <div class="flex items-start mb-1.5">
+                  <span class="unread-dot mt-1.5"></span>
+                  <div class="flex-grow">
+                    <p class="text-sm font-semibold card-text-main">妈妈</p>
+                  </div>
+                  <p class="text-xs card-text-secondary ml-auto flex-shrink-0">昨天 10:00</p>
+                </div>
+                <p class="text-sm card-text-main line-clamp-2 leading-relaxed ml-5">{/* Adjusted margin for alignment with dot */} 生日快乐！希望你今天过得开开心心，每一天都充满阳光和欢笑！这是我特意为你准备的小惊喜。</p>
+              </div>
+
+              <div class="glassmorphism-card p-4 shadow-lg cursor-pointer hover:shadow-xl transition-shadow">
+                <div class="flex items-start mb-1.5">
+                  {/* No unread dot for read messages */}
+                  <div class="w-[10px] mr-[8px] flex-shrink-0"></div>
+                  {/* Placeholder for alignment */}
+                  <div class="flex-grow">
+                    <p class="text-sm font-semibold card-text-main">最好的朋友</p>
+                  </div>
+                  <p class="text-xs card-text-secondary ml-auto flex-shrink-0">2小时前</p>
+                </div>
+                <div class="flex items-center ml-5">
+                  {/* Adjusted margin for alignment */}
+                  <span class="material-icons-outlined card-text-accent text-lg mr-1.5">smart_display</span>
+                  <p class="text-sm card-text-main truncate">【视频回响】有个惊喜给你！</p>
+                </div>
+              </div>
+
+              <div class="glassmorphism-card p-4 shadow-lg cursor-pointer hover:shadow-xl transition-shadow">
+                <div class="flex items-start mb-1.5">
+                  <div class="w-[10px] mr-[8px] flex-shrink-0"></div>
+                  {/* Placeholder for alignment */}
+                  <div class="flex-grow">
+                    <p class="text-sm font-semibold card-text-main">未来的自己</p>
+                  </div>
+                  <p class="text-xs card-text-secondary ml-auto flex-shrink-0">上周三</p>
+                </div>
+                <p class="text-sm card-text-main line-clamp-2 leading-relaxed ml-5">{/* Adjusted margin for alignment */} 还记得当初的梦想吗？不要忘记为什么出发，坚持下去，你会感谢现在的自己。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer id="main-footer" class="app-bar fixed bottom-0 left-0 right-0 z-40 shadow-t-lg border-t">
+      <div class="max-w-sm mx-auto px-1.5 tab-bar-main-height flex items-center">
+        <div class="flex justify-around items-center w-full">
+          <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 hover:opacity-75 transition-opacity">
+            <span class="material-icons-outlined text-2xl">home</span>
+            <span class="text-xs mt-0.5">首页</span>
+          </a>
+          <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 hover:opacity-75 transition-opacity">
+            <span class="material-icons-outlined text-2xl">history_edu</span>
+            <span class="text-xs mt-0.5">草稿箱</span>
+          </a>
+          <a href="#" class="tab-item add-button-wrapper flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5">
+            <div class="p-3 rounded-full shadow-lg -mt-5 transform hover:scale-105 transition-all">
+              <span class="material-icons-outlined text-2xl">add</span>
+            </div>
+            <span class="text-xs mt-1">创建</span>
+          </a>
+          <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 hover:opacity-75 transition-opacity">
+            <span class="material-icons-outlined text-2xl">schedule_send</span>
+            <span class="text-xs mt-0.5">待发送</span>
+          </a>
+          <a href="#" class="tab-item active-tab flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5"> <span class="material-icons-outlined text-2xl">mark_email_read</span> <span class="text-xs mt-0.5">收到的</span> </a>
+        </div>
+      </div>
+      <div class="home-indicator-bar home-indicator-height flex justify-center items-end pb-1">
+        <div class="w-32 h-1.5 rounded-full"></div>
+      </div>
+    </footer>
+
+    <script>
+      const receivedListContent = document.getElementById("received-list-content");
+      const emptyStateReceivedDiv = document.getElementById("received-empty-state");
+
+      // Time display in status bar
+      const currentTimeDisplayReceived = document.getElementById("currentTimeDisplayReceived");
+
+      function updateReceivedPageTime() {
+        if (currentTimeDisplayReceived) {
+          const now = new Date();
+          currentTimeDisplayReceived.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+        }
+      }
+
+      function checkReceivedEmptyState() {
+        // This function would check if there are any items in the "New Friend Requests"
+        // AND "Accepted Echos" sections. For this static example, we'll assume
+        // there's content and keep the empty state hidden.
+        // In a dynamic app, you'd count actual items.
+        const hasFriendRequests = receivedListContent.querySelectorAll(".stranger-card").length > 0;
+        const hasAcceptedEchos = receivedListContent.querySelectorAll(".space-y-3 > .glassmorphism-card").length > 0; // More specific selector for accepted echos
+
+        if (!hasFriendRequests && !hasAcceptedEchos) {
+          emptyStateReceivedDiv.classList.remove("hidden");
+          receivedListContent.classList.add("hidden"); // Hide the list container
+        } else {
+          emptyStateReceivedDiv.classList.add("hidden");
+          receivedListContent.classList.remove("hidden");
+        }
+      }
+
+      const emptyStateCreateButtonReceived = document.getElementById("empty-state-create-button-received");
+      if (emptyStateCreateButtonReceived) {
+        emptyStateCreateButtonReceived.addEventListener("click", () => {
+          console.log("Navigate to create page from received empty state");
+        });
+      }
+
+      // Initial Check
+      updateReceivedPageTime();
+      setInterval(updateReceivedPageTime, 60000); // Update time every minute
+      checkReceivedEmptyState(); // Call this to set initial visibility
+
+      // Example: Simulate removing all items to show empty state after a delay
+      // setTimeout(() => {
+      //     const allCards = receivedListContent.querySelectorAll('.glassmorphism-card');
+      //     allCards.forEach(card => card.remove());
+      //     const allHeaders = receivedListContent.querySelectorAll('h2');
+      //     allHeaders.forEach(header => header.remove());
+      //     checkReceivedEmptyState();
+      // }, 5000); // After 5 seconds, for demonstration
+    </script>
+  </body>
+</html>

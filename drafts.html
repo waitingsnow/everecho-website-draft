@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>EverEcho - 我的回响草稿</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <style>
+      :root {
+        /* Primary Action Color from reference (Coral Red) */
+        --dd-primary-action: #ff6f61;
+        --dd-primary-action-hover: #e55a4f;
+
+        /* This page's specific primary button color (Pink) */
+        --pg-primary-pink: #ff70a6; /* Used for empty state button */
+        --pg-primary-pink-hover: #ff5c99;
+
+        /* Text Colors from reference */
+        --text-primary: #111827; /* Darker gray for primary text on light cards */
+        --text-secondary: #4b5563; /* Medium gray for secondary text on light cards */
+        --text-hint: #9ca3af; /* Lighter gray for hints/placeholders on light cards */
+        --text-on-gradient: #f0f0f0; /* Light text for elements directly on dark gradient */
+        --text-on-gradient-secondary: #d1d5db; /* Slightly darker light text */
+
+        /* Card Styles from reference */
+        --card-bg: rgba(255, 255, 255, 0.92);
+        --card-border-color: rgba(0, 0, 0, 0.03);
+        --card-shadow: 0px 15px 40px rgba(0, 0, 0, 0.12);
+        --card-border-radius: 1.25rem;
+
+        /* Input Styles from reference */
+        --input-border-radius: 0.625rem; /* 10px */
+      }
+
+      body {
+        font-family: "Noto Sans SC", sans-serif;
+        min-height: 100vh;
+        overscroll-behavior-y: contain;
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(135deg, #ff8a8a 0%, #e26ee5 50%, #7879f1 100%); /* Keep this page's gradient */
+        color: var(--text-on-gradient); /* Default text color for elements directly on gradient */
+        user-select: none;
+      }
+
+      main {
+        padding-top: calc(24px + 48px);
+        padding-bottom: calc(56px + 20px);
+      }
+
+      /* Glassmorphism Card (Base for draft items) */
+      .glassmorphism-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--card-border-color);
+        box-shadow: var(--card-shadow);
+        border-radius: var(--card-border-radius);
+        color: var(--text-primary); /* Text inside cards should be dark */
+      }
+
+      /* Nav and Tab bars styling (from reference .app-bar) */
+      .app-bar {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-color: var(--card-border-color);
+        box-shadow: var(--card-shadow);
+      }
+      .app-bar h1 {
+        color: var(--text-primary);
+      }
+      .app-bar .material-icons-outlined {
+        color: var(--text-secondary);
+      }
+
+      /* Button Styling (base from reference) */
+      .btn {
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--input-border-radius);
+        font-size: 0.75rem; /* 12px */
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background-color 0.3s ease,
+          transform 0.15s ease,
+          box-shadow 0.3s ease;
+        line-height: 1.4;
+        text-align: center;
+        border: 1px solid transparent;
+      }
+      .btn .material-icons-outlined {
+        font-size: 1rem; /* 16px */
+        margin-right: 0.375rem; /* 6px */
+      }
+      .btn:active {
+        transform: scale(0.97);
+      }
+
+      /* Secondary button for card actions (styled like reference btn-secondary-action) */
+      .btn-card-secondary {
+        background-color: #ffffff;
+        color: var(--text-secondary);
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      }
+      .btn-card-secondary:hover {
+        background-color: #f9fafb;
+        border-color: #d1d5db;
+        color: var(--text-primary);
+      }
+
+      /* Danger button for card actions (styled like reference btn-outline-action with danger colors) */
+      .btn-card-danger {
+        background-color: transparent;
+        border: 1.5px solid #ef4444; /* Tailwind red-500 */
+        color: #ef4444;
+      }
+      .btn-card-danger:hover {
+        background-color: rgba(239, 68, 68, 0.08); /* Light red fill */
+        color: #dc2626; /* Tailwind red-600 */
+      }
+
+      /* Primary button for empty state */
+      .btn-primary-pink {
+        background-color: var(--pg-primary-pink);
+        color: white;
+      }
+      .btn-primary-pink:hover {
+        background-color: var(--pg-primary-pink-hover);
+        box-shadow: 0 4px 15px rgba(255, 112, 166, 0.3);
+      }
+
+      /* Tab Bar Styling */
+      #main-footer .tab-item span,
+      #main-footer .tab-item .material-icons-outlined {
+        color: var(--text-secondary);
+      }
+      #main-footer .active-tab .material-icons-outlined,
+      #main-footer .active-tab span {
+        color: var(--dd-primary-action);
+      }
+      #main-footer .tab-item:hover span,
+      #main-footer .tab-item:hover .material-icons-outlined {
+        color: var(--text-primary);
+      }
+      #main-footer .add-button-wrapper div {
+        background-color: var(--dd-primary-action) !important;
+      }
+      #main-footer .add-button-wrapper div .material-icons-outlined {
+        color: white !important;
+      }
+
+      /* Home indicator bar */
+      .home-indicator-bar {
+        background-color: var(--card-bg);
+        border-top: 1px solid var(--card-border-color);
+      }
+      .home-indicator-bar div {
+        background-color: rgba(0, 0, 0, 0.15);
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 3px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: var(--text-hint);
+        border-radius: 3px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
+      }
+
+      .status-bar-height {
+        height: 24px;
+      }
+      .nav-bar-height {
+        height: 48px;
+      }
+      .tab-bar-main-height {
+        height: 56px;
+      }
+      .home-indicator-height {
+        height: 20px;
+      }
+
+      /* Text color adjustments for content inside .glassmorphism-card */
+      .glassmorphism-card .card-text-main {
+        color: var(--text-primary);
+      }
+      .glassmorphism-card .card-text-secondary {
+        color: var(--text-secondary);
+      }
+      .glassmorphism-card .card-text-accent {
+        color: var(--pg-primary-pink);
+      } /* Pink accent for draft titles */
+
+      /* Empty state styling */
+      .empty-state-icon {
+        color: var(--text-hint);
+      }
+      .empty-state-text {
+        color: var(--text-secondary);
+      } /* Text inside empty state card */
+    </style>
+  </head>
+  <body class="flex flex-col h-screen">
+    <div class="fixed top-0 left-0 right-0 z-50 status-bar-height px-3 flex justify-between items-center text-xs bg-transparent">
+      <div id="currentTimeDisplayDrafts">9:41</div>
+      <div class="flex items-center space-x-1">
+        <span class="material-icons-outlined text-sm" style="color: #fff">signal_cellular_alt</span>
+        <span class="material-icons-outlined text-sm" style="color: #fff">wifi</span>
+        <span class="material-icons-outlined text-sm" style="color: #fff">battery_full</span>
+      </div>
+    </div>
+
+    <nav class="app-bar fixed left-0 right-0 z-40 py-0 px-4 shadow-md nav-bar-height flex items-center border-b" style="top: 24px">
+      <div class="max-w-sm mx-auto flex items-center justify-center relative w-full h-full">
+        <h1 class="text-base font-semibold">我的回响草稿</h1>
+      </div>
+    </nav>
+
+    <main class="flex-grow overflow-y-auto custom-scrollbar">
+      <div class="max-w-sm mx-auto w-full px-3 py-4">
+        <p class="text-center text-sm my-3.5 leading-relaxed" style="color: var(--text-on-gradient-secondary)">那些悄悄话，还没说完呢，<br />随时可以回来继续。</p>
+
+        <div id="drafts-list" class="space-y-3.5">
+          <div class="glassmorphism-card p-4 shadow-lg">
+            <div class="flex justify-between items-start">
+              <div class="flex-grow mr-3 min-w-0">
+                <p class="text-sm card-text-main line-clamp-3 leading-relaxed mb-1.5">
+                  <span class="font-semibold card-text-accent">致未来的自己：</span>亲爱的，希望你还记得今天许下的愿望，关于旅行、学习和爱，还有那些闪闪发光的梦想，不要轻易放弃啊，加油！
+                </p>
+                <p class="text-xs card-text-secondary">上次保存：昨天 15:30</p>
+              </div>
+              <div class="flex flex-col space-y-2.5 flex-shrink-0">
+                <button class="btn btn-card-secondary"><span class="material-icons-outlined">edit</span>编辑</button>
+                <button class="btn btn-card-danger" onclick="showDeleteModal(this.closest('.glassmorphism-card'))"><span class="material-icons-outlined">delete_outline</span>删除</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="glassmorphism-card p-4 shadow-lg">
+            <div class="flex justify-between items-start">
+              <div class="flex-grow mr-3 min-w-0">
+                <div class="flex items-center mb-1.5">
+                  <span class="material-icons-outlined card-text-accent text-xl mr-2">videocam</span>
+                  <p class="text-sm card-text-main font-medium truncate leading-relaxed">【视频回响】给妈妈的生日祝福</p>
+                </div>
+                <p class="text-xs card-text-secondary">上次保存：3天前</p>
+              </div>
+              <div class="flex flex-col space-y-2.5 flex-shrink-0">
+                <button class="btn btn-card-secondary"><span class="material-icons-outlined">edit</span>编辑</button>
+                <button class="btn btn-card-danger" onclick="showDeleteModal(this.closest('.glassmorphism-card'))"><span class="material-icons-outlined">delete_outline</span>删除</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="glassmorphism-card p-4 shadow-lg">
+            <div class="flex justify-between items-start">
+              <div class="flex-grow mr-3 min-w-0">
+                <p class="text-sm card-text-main line-clamp-3 leading-relaxed mb-1.5">一些关于人生的小感悟，想要记录下来，或许以后会分享这份心情。生活总有不期而遇的温暖和惊喜。</p>
+                <p class="text-xs card-text-secondary">上次保存：5月20日</p>
+              </div>
+              <div class="flex flex-col space-y-2.5 flex-shrink-0">
+                <button class="btn btn-card-secondary"><span class="material-icons-outlined">edit</span>编辑</button>
+                <button class="btn btn-card-danger" onclick="showDeleteModal(this.closest('.glassmorphism-card'))"><span class="material-icons-outlined">delete_outline</span>删除</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="glassmorphism-card p-4 shadow-lg">
+            <div class="flex justify-between items-start">
+              <div class="flex-grow mr-3 min-w-0">
+                <p class="text-sm card-text-main line-clamp-3 leading-relaxed mb-1.5"><span class="font-semibold card-text-accent">给十年后的我：</span>还在坚持当初的选择吗？有没有活成自己想要的样子？希望你一切都好。</p>
+                <p class="text-xs card-text-secondary">上次保存：1周前</p>
+              </div>
+              <div class="flex flex-col space-y-2.5 flex-shrink-0">
+                <button class="btn btn-card-secondary"><span class="material-icons-outlined">edit</span>编辑</button>
+                <button class="btn btn-card-danger" onclick="showDeleteModal(this.closest('.glassmorphism-card'))"><span class="material-icons-outlined">delete_outline</span>删除</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="glassmorphism-card p-4 shadow-lg">
+            <div class="flex justify-between items-start">
+              <div class="flex-grow mr-3 min-w-0">
+                <div class="flex items-center mb-1.5">
+                  <span class="material-icons-outlined card-text-accent text-xl mr-2">mic</span>
+                  <p class="text-sm card-text-main font-medium truncate leading-relaxed">【音频】深夜随想与感悟</p>
+                </div>
+                <p class="text-xs card-text-secondary">上次保存：2025-05-01</p>
+              </div>
+              <div class="flex flex-col space-y-2.5 flex-shrink-0">
+                <button class="btn btn-card-secondary"><span class="material-icons-outlined">edit</span>编辑</button>
+                <button class="btn btn-card-danger" onclick="showDeleteModal(this.closest('.glassmorphism-card'))"><span class="material-icons-outlined">delete_outline</span>删除</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="drafts-empty-state" class="text-center py-12 mt-5 hidden glassmorphism-card p-6">
+            <span class="material-icons-outlined text-7xl empty-state-icon mb-4">drafts</span>
+            <p class="empty-state-text text-sm mb-5">您的回响草稿箱是空的。</p>
+            <button id="empty-state-create-button-drafts" class="btn btn-primary-pink px-8 py-2.5 text-sm">开始创作我的第一个回响</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer id="main-footer" class="app-bar fixed bottom-0 left-0 right-0 z-40 shadow-t-lg border-t">
+      <div class="max-w-sm mx-auto px-1.5 tab-bar-main-height flex items-center">
+        <div class="flex justify-around items-center w-full">
+          <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 hover:opacity-75 transition-opacity">
+            <span class="material-icons-outlined text-2xl">home</span>
+            <span class="text-xs mt-0.5">首页</span>
+          </a>
+          <a href="#" class="tab-item active-tab flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5">
+            <span class="material-icons-outlined text-2xl">history_edu</span>
+            <span class="text-xs mt-0.5">草稿箱</span>
+          </a>
+          <a href="#" class="tab-item add-button-wrapper flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5">
+            <div class="p-3 rounded-full shadow-lg -mt-5 transform hover:scale-105 transition-all">
+              <span class="material-icons-outlined text-2xl">add</span>
+            </div>
+            <span class="text-xs mt-1">创建</span>
+          </a>
+          <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 hover:opacity-75 transition-opacity">
+            <span class="material-icons-outlined text-2xl">schedule_send</span> <span class="text-xs mt-0.5">待发送</span>
+          </a>
+          <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 hover:opacity-75 transition-opacity">
+            <span class="material-icons-outlined text-2xl">person_outline</span>
+            <span class="text-xs mt-0.5">我的</span>
+          </a>
+        </div>
+      </div>
+      <div class="home-indicator-bar home-indicator-height flex justify-center items-end pb-1">
+        <div class="w-32 h-1.5 rounded-full"></div>
+      </div>
+    </footer>
+
+    <div id="custom-delete-modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
+      <div id="custom-delete-modal" class="bg-white p-6 rounded-xl shadow-xl w-full max-w-xs text-center glassmorphism-card">
+        <h3 id="delete-modal-title" class="text-lg font-semibold mb-2 card-text-main">删除草稿</h3>
+        <p id="delete-modal-message" class="text-sm mb-6 card-text-secondary">您确定要删除这份草稿吗？<br />这个操作无法撤销哦。</p>
+        <div class="flex space-x-3">
+          <button id="delete-modal-confirm-button" class="btn btn-card-danger w-full py-2.5">确认删除</button>
+          <button id="delete-modal-close-button" class="btn btn-card-secondary w-full py-2.5">不，保留它</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const draftsListContainer = document.getElementById("drafts-list");
+      const emptyStateDraftsDiv = document.getElementById("drafts-empty-state");
+      let itemToDelete = null;
+
+      // Time display in status bar
+      const currentTimeDisplayDrafts = document.getElementById("currentTimeDisplayDrafts");
+
+      function updateDraftsPageTime() {
+        if (currentTimeDisplayDrafts) {
+          const now = new Date();
+          currentTimeDisplayDrafts.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+        }
+      }
+
+      function checkDraftsEmptyState() {
+        const items = draftsListContainer.querySelectorAll(".glassmorphism-card:not(#drafts-empty-state)"); // Exclude empty state card itself
+        if (items.length === 0) {
+          emptyStateDraftsDiv.classList.remove("hidden");
+        } else {
+          emptyStateDraftsDiv.classList.add("hidden");
+        }
+      }
+
+      // Modal elements for Delete
+      const customDeleteModalOverlay = document.getElementById("custom-delete-modal-overlay");
+      const deleteModalConfirmButton = document.getElementById("delete-modal-confirm-button");
+      const deleteModalCloseButton = document.getElementById("delete-modal-close-button");
+
+      function showDeleteModal(cardElement) {
+        itemToDelete = cardElement;
+        customDeleteModalOverlay.classList.remove("hidden");
+        customDeleteModalOverlay.classList.add("flex");
+      }
+
+      function hideDeleteModal() {
+        customDeleteModalOverlay.classList.add("hidden");
+        customDeleteModalOverlay.classList.remove("flex");
+        itemToDelete = null;
+      }
+
+      deleteModalConfirmButton.addEventListener("click", () => {
+        if (itemToDelete) {
+          itemToDelete.remove();
+          console.log("用户确认删除草稿。");
+          checkDraftsEmptyState();
+        }
+        hideDeleteModal();
+      });
+
+      deleteModalCloseButton.addEventListener("click", () => {
+        console.log("用户取消删除操作。");
+        hideDeleteModal();
+      });
+
+      const emptyStateCreateButtonDrafts = document.getElementById("empty-state-create-button-drafts");
+      if (emptyStateCreateButtonDrafts) {
+        emptyStateCreateButtonDrafts.addEventListener("click", () => {
+          console.log("Navigate to create page from drafts empty state");
+          // window.location.href = "path/to/create_page.html";
+        });
+      }
+
+      // Initial Check
+      updateDraftsPageTime();
+      setInterval(updateDraftsPageTime, 60000); // Update time every minute
+      checkDraftsEmptyState();
+    </script>
+  </body>
+</html>

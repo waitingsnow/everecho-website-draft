@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>EverEcho - 已安排的回响</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <style>
+      :root {
+        /* Primary Action Color from reference (Coral Red) */
+        --dd-primary-action: #ff6f61;
+        --dd-primary-action-hover: #e55a4f;
+
+        /* This page's specific primary button color (Pink) */
+        --pg-primary-pink: #ff70a6;
+        --pg-primary-pink-hover: #ff5c99;
+
+        /* Text Colors from reference */
+        --text-primary: #111827; /* Darker gray for primary text, good on light cards */
+        --text-secondary: #4b5563; /* Medium gray for secondary text */
+        --text-hint: #9ca3af; /* Lighter gray for hints/placeholders */
+
+        /* Card Styles from reference */
+        --card-bg: rgba(255, 255, 255, 0.92);
+        --card-border-color: rgba(0, 0, 0, 0.03);
+        --card-shadow: 0px 15px 40px rgba(0, 0, 0, 0.12);
+        --card-border-radius: 1.25rem;
+
+        /* Input Styles from reference (though not heavily used on this page) */
+        --input-border-radius: 0.625rem; /* 10px */
+      }
+
+      body {
+        font-family: "Noto Sans SC", sans-serif;
+        min-height: 100vh;
+        overscroll-behavior-y: contain;
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(135deg, #ff8a8a 0%, #e26ee5 50%, #7879f1 100%); /* Keep this page's gradient */
+        color: var(--text-primary); /* Default text color for content within cards */
+        user-select: none;
+      }
+
+      main {
+        padding-top: calc(24px + 48px); /* status-bar-height + nav-bar-height */
+        padding-bottom: calc(56px + 20px); /* tab-bar-main-height + home-indicator-height */
+      }
+
+      /* Glassmorphism Card (Scheduled Echo Item) */
+      .glassmorphism-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--card-border-color);
+        box-shadow: var(--card-shadow);
+        border-radius: var(--card-border-radius); /* Use reference style */
+        color: var(--text-primary); /* Ensure text inside cards is dark */
+      }
+
+      /* Nav and Tab bars styling (from reference .app-bar) */
+      .app-bar {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-color: var(--card-border-color); /* For border-b or border-t */
+        box-shadow: var(--card-shadow);
+      }
+      .app-bar h1 {
+        color: var(--text-primary);
+      }
+      .app-bar .material-icons-outlined {
+        color: var(--text-secondary);
+      }
+
+      /* Button Styling (base from reference) */
+      .btn {
+        padding: 0.5rem 0.75rem; /* Adjusted for smaller card buttons */
+        border-radius: var(--input-border-radius);
+        font-size: 0.75rem; /* 12px */
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background-color 0.3s ease,
+          transform 0.15s ease,
+          box-shadow 0.3s ease;
+        line-height: 1.4;
+        text-align: center;
+        border: 1px solid transparent;
+      }
+      .btn .material-icons-outlined {
+        font-size: 1rem; /* 16px */
+        margin-right: 0.25rem; /* 4px */
+      }
+      .btn:active {
+        transform: scale(0.97);
+      }
+
+      /* Primary button for this page (Pink) */
+      .btn-primary-pink {
+        background-color: var(--pg-primary-pink);
+        color: white;
+      }
+      .btn-primary-pink:hover {
+        background-color: var(--pg-primary-pink-hover);
+        box-shadow: 0 4px 15px rgba(255, 112, 166, 0.3);
+      }
+
+      /* Secondary button for card actions (styled like reference btn-secondary-action) */
+      .btn-card-secondary {
+        background-color: #ffffff;
+        color: var(--text-secondary);
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      }
+      .btn-card-secondary:hover {
+        background-color: #f9fafb;
+        border-color: #d1d5db;
+        color: var(--text-primary);
+      }
+
+      /* Danger button for card actions (styled like reference btn-outline-action with danger colors) */
+      .btn-card-danger {
+        background-color: transparent;
+        border: 1.5px solid #ef4444; /* Tailwind red-500 */
+        color: #ef4444;
+      }
+      .btn-card-danger:hover {
+        background-color: rgba(239, 68, 68, 0.08); /* Light red fill */
+        color: #dc2626; /* Tailwind red-600 */
+      }
+
+      /* Tab Bar Styling */
+      #main-footer .tab-item span,
+      #main-footer .tab-item .material-icons-outlined {
+        color: var(--text-secondary); /* Darker text for inactive tabs on light bar */
+      }
+      #main-footer .active-tab .material-icons-outlined,
+      #main-footer .active-tab span {
+        color: var(--dd-primary-action); /* Use coral red for active tab icon */
+      }
+      #main-footer .tab-item:hover span,
+      #main-footer .tab-item:hover .material-icons-outlined {
+        color: var(--text-primary);
+      }
+      /* Central "add" button in tab bar */
+      #main-footer .add-button-wrapper div {
+        /* Targeting the add button */
+        background-color: var(--dd-primary-action) !important;
+      }
+      #main-footer .add-button-wrapper div .material-icons-outlined {
+        color: white !important;
+      }
+
+      /* Home indicator bar at the very bottom */
+      .home-indicator-bar {
+        background-color: var(--card-bg); /* Match footer bar background */
+        border-top: 1px solid var(--card-border-color);
+      }
+      .home-indicator-bar div {
+        background-color: rgba(0, 0, 0, 0.15); /* Darker indicator on light bg */
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 3px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: var(--text-hint);
+        border-radius: 3px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
+      }
+
+      .status-bar-height {
+        height: 24px;
+      }
+      .nav-bar-height {
+        height: 48px;
+      }
+      .tab-bar-main-height {
+        height: 56px;
+      }
+      .home-indicator-height {
+        height: 20px;
+      }
+
+      /* Text color adjustments for content inside .glassmorphism-card */
+      .glassmorphism-card .card-text-main {
+        color: var(--text-primary);
+      }
+      .glassmorphism-card .card-text-secondary {
+        color: var(--text-secondary);
+      }
+      .glassmorphism-card .card-text-accent {
+        color: var(--dd-primary-action);
+      } /* Use coral for accents inside cards */
+      .glassmorphism-card .card-content-preview-bg {
+        background-color: rgba(0, 0, 0, 0.03);
+      }
+
+      /* Empty state styling */
+      .empty-state-icon {
+        color: var(--text-hint);
+      }
+      .empty-state-text {
+        color: var(--text-secondary);
+      }
+      .empty-state-button {
+        /* Will use .btn and .btn-primary-pink */
+      }
+    </style>
+  </head>
+  <body class="text-white flex flex-col h-screen">
+    <div class="fixed top-0 left-0 right-0 z-50 status-bar-height px-3 flex justify-between items-center text-xs bg-transparent">
+      <div id="currentTimeDisplayScheduled">9:41</div>
+      <div class="flex items-center space-x-1">
+        <span class="material-icons-outlined text-sm" style="color: #fff">signal_cellular_alt</span>
+        <span class="material-icons-outlined text-sm" style="color: #fff">wifi</span>
+        <span class="material-icons-outlined text-sm" style="color: #fff">battery_full</span>
+      </div>
+    </div>
+
+    <nav class="app-bar fixed left-0 right-0 z-40 py-0 px-4 shadow-md nav-bar-height flex items-center border-b" style="top: 24px">
+      <div class="max-w-sm mx-auto flex items-center justify-center relative w-full h-full">
+        <h1 class="text-base font-semibold">EverEcho: 已安排的回响</h1>
+      </div>
+    </nav>
+
+    <main class="flex-grow overflow-y-auto custom-scrollbar">
+      <div class="max-w-sm mx-auto w-full px-3 py-4">
+        <div id="scheduled-list" class="space-y-4">
+          <div class="glassmorphism-card p-4 shadow-lg">
+            <div class="mb-2.5">
+              <p class="text-xs card-text-secondary">将发送给：<span class="font-medium card-text-main">亲爱的妈妈</span></p>
+              <p class="text-sm font-semibold card-text-accent flex items-center mt-1">
+                <span class="material-icons-outlined text-base mr-1.5">calendar_today</span>
+                将于：2025年12月25日 上午9:00 送达
+              </p>
+            </div>
+            <div class="mb-3.5">
+              <p class="text-xs card-text-secondary mb-1">心意预览：</p>
+              <p class="text-sm card-text-main line-clamp-2 leading-relaxed card-content-preview-bg p-2.5 rounded-md">生日快乐！希望你今天过得开开心心，每一天都充满阳光和欢笑！这是我特意为你准备的小惊喜。</p>
+            </div>
+            <div class="flex items-center justify-end space-x-2.5">
+              <button class="btn btn-card-secondary"><span class="material-icons-outlined">visibility</span>查看详情</button>
+              <button class="btn btn-card-secondary"><span class="material-icons-outlined">edit</span>修改</button>
+              <button class="btn btn-card-danger" onclick="showCancelModal(this.closest('.glassmorphism-card'))"><span class="material-icons-outlined">cancel_schedule_send</span>取消发送</button>
+            </div>
+          </div>
+
+          <div class="glassmorphism-card p-4 shadow-lg">
+            <div class="mb-2.5">
+              <p class="text-xs card-text-secondary">将发送给：<span class="font-medium card-text-main">未来的我</span></p>
+              <p class="text-sm font-semibold card-text-accent flex items-center mt-1">
+                <span class="material-icons-outlined text-base mr-1.5">calendar_today</span>
+                将于：2030年01月01日 凌晨0:00 送达
+              </p>
+            </div>
+            <div class="mb-3.5">
+              <p class="text-xs card-text-secondary mb-1">心意预览：</p>
+              <div class="flex items-center card-content-preview-bg p-2.5 rounded-md">
+                <span class="material-icons-outlined card-text-accent text-xl mr-2">smart_display</span>
+                <p class="text-sm card-text-main font-medium truncate leading-relaxed">【视频祝福】新的一年，要更加努力哦！</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-end space-x-2.5">
+              <button class="btn btn-card-secondary"><span class="material-icons-outlined">visibility</span>查看详情</button>
+              <button class="btn btn-card-secondary"><span class="material-icons-outlined">edit</span>修改</button>
+              <button class="btn btn-card-danger" onclick="showCancelModal(this.closest('.glassmorphism-card'))"><span class="material-icons-outlined">cancel_schedule_send</span>取消发送</button>
+            </div>
+          </div>
+
+          <div class="glassmorphism-card p-4 shadow-lg">
+            <div class="mb-2.5">
+              <p class="text-xs card-text-secondary">将发送给：<span class="font-medium card-text-main">小明</span></p>
+              <p class="text-sm font-semibold card-text-accent flex items-center mt-1">
+                <span class="material-icons-outlined text-base mr-1.5">calendar_today</span>
+                将于：2024年08月15日 下午3:00 送达
+              </p>
+            </div>
+            <div class="mb-3.5">
+              <p class="text-xs card-text-secondary mb-1">心意预览：</p>
+              <p class="text-sm card-text-main line-clamp-2 leading-relaxed card-content-preview-bg p-2.5 rounded-md">记得我们约定好的那个秘密计划吗？时间快到了，期待和你一起完成！</p>
+            </div>
+            <div class="flex items-center justify-end space-x-2.5">
+              <button class="btn btn-card-secondary"><span class="material-icons-outlined">visibility</span>查看详情</button>
+              <button class="btn btn-card-secondary"><span class="material-icons-outlined">edit</span>修改</button>
+              <button class="btn btn-card-danger" onclick="showCancelModal(this.closest('.glassmorphism-card'))"><span class="material-icons-outlined">cancel_schedule_send</span>取消发送</button>
+            </div>
+          </div>
+
+          <div id="empty-state" class="text-center py-12 mt-5 hidden content-card p-6">
+            <span class="material-icons-outlined text-7xl empty-state-icon mb-4">schedule</span>
+            <p class="empty-state-text text-sm mb-6">这里还没有已安排的回响呢。<br />去创作一份心意，让它在未来的某个特别时刻，<br />悄悄送达温暖吧！</p>
+            <button id="empty-state-create-button" class="btn btn-primary-pink px-8 py-2.5 text-sm">开始创作我的回响</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer id="main-footer" class="app-bar fixed bottom-0 left-0 right-0 z-40 shadow-t-lg border-t">
+      <div class="max-w-sm mx-auto px-1.5 tab-bar-main-height flex items-center">
+        <div class="flex justify-around items-center w-full">
+          <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 hover:opacity-75 transition-opacity">
+            <span class="material-icons-outlined text-2xl">home</span>
+            <span class="text-xs mt-0.5">首页</span>
+          </a>
+          <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 hover:opacity-75 transition-opacity">
+            <span class="material-icons-outlined text-2xl">history_edu</span>
+            <span class="text-xs mt-0.5">草稿箱</span>
+          </a>
+          <a href="#" class="tab-item add-button-wrapper flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5">
+            <div class="p-3 rounded-full shadow-lg -mt-5 transform hover:scale-105 transition-all">
+              <span class="material-icons-outlined text-2xl">add</span>
+            </div>
+            <span class="text-xs mt-1">创建</span>
+          </a>
+          <a href="#" class="tab-item active-tab flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5">
+            <span class="material-icons-outlined text-2xl">schedule_send</span>
+            <span class="text-xs mt-0.5">待发送</span>
+          </a>
+          <a href="#" class="tab-item flex flex-col items-center justify-center py-1 px-0.5 rounded-md w-1/5 hover:opacity-75 transition-opacity">
+            <span class="material-icons-outlined text-2xl">person_outline</span>
+            <span class="text-xs mt-0.5">我的</span>
+          </a>
+        </div>
+      </div>
+      <div class="home-indicator-bar home-indicator-height flex justify-center items-end pb-1">
+        <div class="w-32 h-1.5 rounded-full"></div>
+      </div>
+    </footer>
+
+    <div id="custom-cancel-modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
+      <div id="custom-cancel-modal" class="bg-white p-6 rounded-xl shadow-xl w-full max-w-xs text-center content-card">
+        <h3 id="cancel-modal-title" class="text-lg font-semibold mb-2 text-primary">取消回响</h3>
+        <p id="cancel-modal-message" class="text-sm mb-6 text-secondary">您确定要取消这个已安排好的回响吗？<br />一旦取消，它就不会在预定时间发送了哦。</p>
+        <div class="flex space-x-3">
+          <button id="cancel-modal-confirm-button" class="btn btn-card-danger w-full py-2.5">确认取消</button>
+          <button id="cancel-modal-close-button" class="btn btn-card-secondary w-full py-2.5">不，等等</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const scheduledListContainer = document.getElementById("scheduled-list");
+      const emptyStateDiv = document.getElementById("empty-state");
+      let itemToCancel = null; // To store the card element to be removed
+
+      // Time display in status bar
+      const currentTimeDisplayScheduled = document.getElementById("currentTimeDisplayScheduled");
+
+      function updateScheduledPageTime() {
+        if (currentTimeDisplayScheduled) {
+          const now = new Date();
+          currentTimeDisplayScheduled.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+        }
+      }
+
+      function checkEmptyState() {
+        const items = scheduledListContainer.querySelectorAll(".glassmorphism-card");
+        if (items.length === 0) {
+          emptyStateDiv.classList.remove("hidden");
+          emptyStateDiv.classList.add("block"); // Or 'flex' if you use flex for centering
+        } else {
+          emptyStateDiv.classList.add("hidden");
+          emptyStateDiv.classList.remove("block"); // Or 'flex'
+        }
+      }
+
+      // Modal elements
+      const customCancelModalOverlay = document.getElementById("custom-cancel-modal-overlay");
+      const cancelModalConfirmButton = document.getElementById("cancel-modal-confirm-button");
+      const cancelModalCloseButton = document.getElementById("cancel-modal-close-button");
+
+      function showCancelModal(cardElement) {
+        itemToCancel = cardElement;
+        customCancelModalOverlay.classList.remove("hidden");
+        customCancelModalOverlay.classList.add("flex");
+      }
+
+      function hideCancelModal() {
+        customCancelModalOverlay.classList.add("hidden");
+        customCancelModalOverlay.classList.remove("flex");
+        itemToCancel = null;
+      }
+
+      cancelModalConfirmButton.addEventListener("click", () => {
+        if (itemToCancel) {
+          itemToCancel.remove(); // Remove the card from the DOM
+          console.log("用户确认取消发送。");
+          checkEmptyState(); // Check if the list is now empty
+        }
+        hideCancelModal();
+      });
+
+      cancelModalCloseButton.addEventListener("click", () => {
+        console.log("用户取消了操作。");
+        hideCancelModal();
+      });
+
+      // Empty state button functionality (optional, if you want it to navigate)
+      const emptyStateCreateButton = document.getElementById("empty-state-create-button");
+      if (emptyStateCreateButton) {
+        emptyStateCreateButton.addEventListener("click", () => {
+          // Navigate to the create page, e.g., by changing window.location or using a router
+          console.log("Navigate to create page");
+          // window.location.href = "path/to/create_page.html"; // Example navigation
+        });
+      }
+
+      // Initial Check
+      updateScheduledPageTime();
+      setInterval(updateScheduledPageTime, 60000);
+      checkEmptyState();
+    </script>
+  </body>
+</html>
